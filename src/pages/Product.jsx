@@ -1,14 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { Modal } from "bootstrap";
 import Pagination from "../components/Pagination";
 import ProductModal from "../components/ProductModal";
 import DeleteProductModal from "../components/DeleteProductModal";
+import Toast from "../components/Toast";
 
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 const VITE_API_PATH = import.meta.env.VITE_API_PATH;
 
-function Product() {
+function Product({ setIsAuth }) {
   const [modalMode, setModalMode] = useState(null);
   const [products, setProducts] = useState([]);
 
@@ -72,9 +72,29 @@ function Product() {
     getProducts(page);
   };
 
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${VITE_BASE_URL}/v2/logout`);
+      setIsAuth(false);
+    } catch (error) {
+      alert("登出失敗");
+    }
+  };
+
   return (
     <>
       <div className="container py-5">
+        <div className="row mb-3">
+          <div className="justify-content-end">
+            <button
+              onClick={handleLogout}
+              type="button"
+              className="btn btn-secondary"
+            >
+              登出
+            </button>
+          </div>
+        </div>
         <div className="row">
           <div className="col">
             <div className="d-flex justify-content-between">
@@ -151,6 +171,7 @@ function Product() {
         tempProduct={tempProduct}
         getProducts={getProducts}
       />
+      <Toast />
     </>
   );
 }

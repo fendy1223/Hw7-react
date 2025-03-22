@@ -1,6 +1,8 @@
-import { useEffect, useState, useRef, use } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Modal } from "bootstrap";
+import { useDispatch } from "react-redux";
+import { pushMessage } from "../redux/toastSlice";
 
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 const VITE_API_PATH = import.meta.env.VITE_API_PATH;
@@ -32,6 +34,8 @@ function ProductModal({
       modalInstance.show();
     }
   }, [isOpen]);
+
+  const dispatch = useDispatch();
 
   const handleCloseProductModal = () => {
     const modalInstance = Modal.getInstance(productModalRef.current);
@@ -87,8 +91,11 @@ function ProductModal({
           },
         }
       );
+      dispatch(pushMessage({ text: "新增產品成功", status: "success" }));
     } catch (error) {
-      alert("新增產品失敗");
+      // console.log(error);
+      const { message } = error.response.data;
+      dispatch(pushMessage({ text: message.join("、"), status: "failed" }));
     }
   };
 
@@ -105,8 +112,12 @@ function ProductModal({
           },
         }
       );
+
+      dispatch(pushMessage({ text: "編輯產品成功", status: "success" }));
     } catch (error) {
-      alert("編輯產品失敗");
+      // console.log(error);
+      const { message } = error.response.data;
+      dispatch(pushMessage({ text: message, status: "failed" }));
     }
   };
 
@@ -118,7 +129,7 @@ function ProductModal({
       getProducts();
       handleCloseProductModal();
     } catch (error) {
-      alert("更新產品失敗");
+      dispatch(pushMessage({ text: "更新產品失敗", status: "failed" }));
     }
   };
 
@@ -142,7 +153,7 @@ function ProductModal({
         imageUrl: uploadedImageUrl,
       });
     } catch (error) {
-      alert("上傳圖片失敗");
+      dispatch(pushMessage({ text: "上傳圖片失敗", status: "failed" }));
     }
   };
 
